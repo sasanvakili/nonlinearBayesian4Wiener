@@ -134,3 +134,52 @@ The `nonlinearBayesian4Wiener` library provides three modes of operation:
    - `fmincon`, which uses MATLAB's `fmincon` solver and therefore requires MATLAB Optimization Toolbox.
    
    The routine returns the optimized input trajectory and information about the optimization process. See [*Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model*](https://arxiv.org/abs/2504.05490) for the underlying formulation.
+
+
+## Usage
+
+The `nonlinearBayesian4Wiener` library can be invoked in MATLAB using the following command:
+
+`[estimator, optimizer, optimalUbar] = nonlinearBayesian4Wiener(model, settings, vecYbar);`
+
+Ensure that the the library's `src` folder is added to MATLAB's path (e.g., `addpath('./src')`), and the inputs are configured according to the descriptions below.
+
+### Inputs
+
+The `Bayesian4Wiener` library takes the following three major inputs:
+
+*   **`model`**: This struct contains the following model parameters:
+    *   `numState`: The number of states $n _{\mathrm{x}}$.
+    *   `numInput`: The number of inputs $n _{\mathrm{u}}$.
+    *   `numTheta`: The number of unknown parameters, including the zero frequency, $N+1$.  
+    *   `trajectoryT`: The time index of the trajectory ending time $T$.
+    *   `matrixAbar`: The state transition matrix for the entire trajectory, $\mathrm{A}$.
+    *   `matrixBbar`: The input matrix for the entire trajectory, $\mathrm{B}$.
+    *   `vecUbar`: The input vector for the entire trajectory, $\mathrm{u}$.
+    *   `allVecFreq`: The row vector collection of all frequencies $f_{n}$, **EXCLUDING FREQUENCY 0**, i.e., $\[ f _{1}, f _{2}, \ldots, f _{N} \]$.
+    *   `muTheta`: The mean of the unknown $\theta$ prior distribution, $\mu _{\theta}$.
+    *   `sigmaTheta`: The covariance of the unknown $\theta$ prior distribution, $\Sigma _{\theta}$.
+    *   `sigmaVbar`: The measurement noise covariance, $\Sigma _{\mathrm{v}}$.
+    *   `sigmaWbar`: The process noise covariance, $\Sigma _{\mathrm{w}}$.
+
+    All the above fields are mandatory and should be properly provided in order for the library to run.
+
+*   **`settings`**: This struct contains the following fields:
+    *   `mode`: One of the modes discussed in [Library modes](#library-modes), i.e., `affineMMSEestimate`, `dualMMSEestimate`, or `activeLearning`.  This field should be set to one of the available options for the library to run.
+    *   `verbose`: One of the verbosity levels, where $0$ means silent execution and $1$ or $2$ provide minor debugging messages.  Allowed values are 0, 1, or 2. The default is set $0$ for silent execution if this field is not set to one of the available options.
+    *   `activeLearning`: This struct contains the following fields:
+        *   `gradTol`: Stopping criterion for gradient norm threshold, i.e., $\big\lVert \nabla _{\overline{\mathrm{u}}} \mathcal{J} ^{\star} _{\mathrm{B}}(\overline{\mathrm{u}}^{k}) \big\rVert <$ `gradTol`.
+        *   `costTol`: Stopping criterion for cost decrease threshold, i.e., $\big\lvert \mathcal{J} ^{\star} _{\mathrm{B}}(\overline{\mathrm{u}}^{k+1}) - \mathcal{J} ^{\star} _{\mathrm{B}}(\overline{\mathrm{u}}^{k}) \big\rvert <$ `costTol`.
+        *   `maxIter`: Stopping criterion for the maximum number of iterations allowed. The algorithm will terminate when $k$ reaches `maxIter`.
+        *   `alpha`: The initial value $\alpha _{0}$ required for the adaptive stepsize algorithm (recommended value: $\alpha _{0} = 10^{-10}$).
+        *   `beta`: The initial value $\beta _{0}$ required for the adaptive stepsize algorithm (recommended value: $\beta _{0} = 10^{100}$).
+        *   `applyToInitX`: A boolean variable determining whether or not the optimization of $\overline{\mathrm{u}}$ includes optimizing the initial state $\mu _{\mathrm{x} _{0}}$.
+        *   `existConstraint`: A boolean variable determining whether or not there exists a constraint on the input $\mathbb{U}$.
+        *   `vecUmax`: A vector with size $n _{\mathrm{u}}$ that contains the maximum values each dimension of $\mathrm{u} _{t}$ can take. This is required **ONLY** if `existConstraint` is set to true; otherwise, it can be left empty (i.e., `settings.activeLearning.vecUmax = []`).
+        *   `vecUmin`: A vector with size $n _{\mathrm{u}}$ that contains the minimum values each dimension of $\mathrm{u} _{t}$ can take. This is required **ONLY** if `existConstraint` is set to true; otherwise, it can be left empty (i.e., `settings.activeLearning.vecUmin = []`).
+        *   `maxInitState`: A vector with size $n _{\mathrm{x}}$ that contains the maximum values the initial state $\mu _{\mathrm{x} _{0}}$ can take. This is required **ONLY** if both `existConstraint` and `applyToInitX` are set to true; otherwise, it can be left empty (i.e., `settings.activeLearning.maxInitState = []`).
+        *   `minInitState`: A vector with size $n _{\mathrm{x}}$ that contains the minimum values the initial state $\mu _{\mathrm{x} _{0}}$ can take. This is required **ONLY** if both `existConstraint` and `applyToInitX` are set to true; otherwise, it can be left empty (i.e., `settings.activeLearning.minInitState = []`).
+
+        All the above fields are required **ONLY** if the mode is set to `activeLearning` (i.e., `settings.mode = 'activeLearning'`); otherwise, `activeLearning` can be left empty (i.e., `settings.activeLearning = []`).
+
+*   **`vecYbar`**: The vector of measurements, i.e., $\overline{\mathrm{y}} = \[ \mathrm{y} _{0}, \ldots, \mathrm{y} _{T} \] ^{\mathsf{T}}$. This is required **ONLY** if the mode is set to `affineMMSEestimate` or `dualMMSEestimate`; otherwise, it can be left empty (i.e., `vecYbar = []`).
