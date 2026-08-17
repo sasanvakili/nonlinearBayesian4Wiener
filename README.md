@@ -6,8 +6,8 @@ Code accompanying the paper:
 
 This repository provides a MATLAB library for Bayesian estimation and active input design in Wiener models. It includes:
 
-- An affine minimum mean-squared-error (MMSE) estimator for the unknown observation-model parameters;
-- Dual estimators for joint learning of the latent state and unknown parameters;
+- An affine minimum mean-squared-error (MMSE) estimator for the *unknown* observation-model parameters;
+- Dual estimators for joint learning of the *unknown* parameters and *latent* variables;
 - An active-learning algorithm for optimal input design, based on:
   > S. Vakili, M. Mazo Jr., and P. Mohajerin Esfahani, *Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model*, arXiv preprint arXiv:2504.05490, 2025.
 
@@ -82,7 +82,7 @@ $$
 \mathrm{B} = \mathrm{diag} ( \mathbb{I}, \mathrm{B} _{0}, \ldots, \mathrm{B} _{T-1}).
 $$
 
-This library uses these structures to compute the affine MMSE estimate $`\hat{\theta}_{\mathrm{af}}(\mathrm{y})`$ and the nonlinear Bayesian estimate $`\hat{\theta}_{\mathrm{nl}}(\mathrm{y})`$, obtained using either the **dual basis-parameter** (DB-P) or **dual state-parameter**
+This library uses these structures to compute the affine MMSE estimate $`\hat{\theta}_{\mathrm{af}}`$ and the nonlinear Bayesian estimate $`\hat{\theta}_{\mathrm{nl}}`$, obtained using either the **dual basis-parameter** (DB-P) or **dual state-parameter**
 (DS-P) estimator. For further details, see the paper [*Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization*](https://arxiv.org/abs/2606.10111).
 
 ## Requirements
@@ -116,37 +116,21 @@ no third-party dependencies.
 
 The `nonlinearBayesian4Wiener` library provides three modes of operation:
 
-1. **`affineMMSEestimate`**  
-Computes the optimal Bayesian affine MMSE estimator for the _unknown_ parameter vector using the measurements over the complete trajectory, $\mathrm{y}$. It evaluates $\hat{\theta} _{\mathrm{af}}(\mathrm{y}) = \Psi^{\star} _{\theta}\mathrm{y} + \psi^{\star} _{\theta}$ and returns the optimal affine coefficients $\Psi^{\star} _{\theta}$, $\psi^{\star} _{\theta}$, the prior dynamic basis statistics mean $\mu _{\mathrm{\Phi}}$, the operator $\mathcal{M}$, the optimal cost $\mathcal{J} ^{\star} _{\theta}$, the parameter estimate $\hat{\theta} _{\mathrm{af}}(\mathrm{y})$, and its estimation-error covariance $\Sigma _{\hat{\theta} _{\mathrm{af}}}$. See Theorem 2.2 of [*Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization*](https://arxiv.org/abs/2606.10111).
+1. **`affineMMSEestimate`**
+   Computes the optimal Bayesian affine MMSE estimator for the *unknown* parameter vector using the measurements over the complete trajectory, $\mathrm{y}$. It evaluates $\hat{\theta} _{\mathrm{af}}(\mathrm{y}) = \Psi^{\star} _{\theta}\mathrm{y} + \psi^{\star} _{\theta}$ and returns the optimal affine coefficients $\Psi^{\star} _{\theta}$, $\psi^{\star} _{\theta}$, the prior dynamic basis statistics mean $\mu _{\mathrm{\Phi}}$, the operator $\mathcal{M}$, the optimal cost $\mathcal{J} ^{\star} _{\theta}$, the parameter estimate $\hat{\theta} _{\mathrm{af}}$, and its estimation-error covariance $\Sigma _{\hat{\theta} _{\mathrm{af}}}$. See Theorem 2.2 of [*Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization*](https://arxiv.org/abs/2606.10111).
 
-3. **`dualMMSEestimate`**  
-   Computes the nonlinear Bayesian parameter estimate
-   $`\hat{\theta}_{\mathrm{nl}}(\mathrm{y})`$ through a fixed-point
-   iteration that couples the affine parameter estimator with a
-   dynamic-basis-statistics (DBS) estimator. Select either:
+2. **`dualMMSEestimate`**
+   Computes the nonlinear Bayesian parameter estimate $`\hat{\theta}_{\mathrm{nl}}`$ through a fixed-point iteration that couples the affine parameter estimator with a dynamic-basis-statistics (DBS) estimator. Select either:
 
-   - `DB-P` for the dual basis-parameter estimator, which updates DBS
-     estimates directly through an affine basis estimator.
-   - `DS-P` for the dual state-parameter estimator, which first computes
-     affine state estimates and their covariance, then maps these
-     state statistics to DBS estimates through the Gaussian DBS operator.
+   - `DB-P` for the **dual basis-parameter** estimator, which updates DBS estimates directly through an affine basis estimator.
+   - `DS-P` for the **dual state-parameter estimator**, which first computes affine state estimates and their covariance, then maps these state statistics to DBS estimates through the Gaussian DBS operator.
+   
+   The procedure alternates between parameter estimation and DBS estimation or state estimation until the specified convergence criterion is met. It returns the nonlinear parameter estimates $(\hat{\theta} _{\mathrm{nl}}, \Sigma _{\hat{\theta} _{\mathrm{nl}}})$, the DBS estimates $(\hat{\mathrm{\Phi}} _{\mathrm{nl}}, \Sigma _{\hat{\mathrm{\Phi}} _{\mathrm{nl}}})$, or state estimates $(\hat{\mathrm{x}} _{\mathrm{nl}}, \Sigma _{\hat{\mathrm{x}} _{\mathrm{nl}}})$, together with fixed-point iteration information. See Section 3 of [*Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization*](https://arxiv.org/abs/2606.10111) for details.
 
-   The procedure alternates between parameter estimation and DBS
-   estimation until the specified convergence criterion is met. It
-   returns the nonlinear parameter estimate, its estimate covariance,
-   the final DBS statistics, and fixed-point iteration information.
+3. **`activeLearning`**
+   Designs an input sequence for the experiment by minimizing anticipated parameter-estimation uncertainty. The optimal input can be determined *a priori* and independently of measurements by solving $\mathrm{u}^{\star} \in \arg\min _{\mathrm{u} \in \mathbb{U}} \mathbb{E} \[ \lVert \theta - \hat{\theta} _{\mathrm{af}}(\mathrm{y}) \rVert ^{2} \]$, where $\mathbb{U}$ is the input space encoding physical constraints on feasible experiment inputs. The method supports two optimizers:
 
-4. **`activeLearning`**  
-   Designs an input sequence for the experiment by optimizing an
-   active-learning objective defined from the anticipated parameter
-   estimation uncertainty. The method supports two optimizers:
-
-   - `adaptive`, which uses the library’s adaptive gradient-descent
-     routine and does not require Optimization Toolbox.
-   - `fmincon`, which uses MATLAB's `fmincon` solver and therefore
-     requires Optimization Toolbox.
-
-   The routine returns the optimized input trajectory and information
-   about the optimization process.
-   See [Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model](https://arxiv.org/abs/2504.05490)
-   for the underlying formulation.
+   - `adaptive`, which uses the library’s adaptive gradient-descent routine and does not require MATLAB Optimization Toolbox.
+   - `fmincon`, which uses MATLAB's `fmincon` solver and therefore requires MATLAB Optimization Toolbox.
+   
+   The routine returns the optimized input trajectory and information about the optimization process. See [*Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model*](https://arxiv.org/abs/2504.05490) for the underlying formulation.
