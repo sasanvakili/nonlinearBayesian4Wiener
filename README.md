@@ -167,19 +167,28 @@ The `Bayesian4Wiener` library takes the following three major inputs:
 *   **`settings`**: This struct contains the following fields:
     *   `mode`: One of the modes discussed in [Library modes](#library-modes), i.e., `affineMMSEestimate`, `dualMMSEestimate`, or `activeLearning`.  This field should be set to one of the available options for the library to run.
     *   `verbose`: One of the verbosity levels, where $0$ means silent execution and $1$ or $2$ provide minor debugging messages.  Allowed values are 0, 1, or 2. The default is set $0$ for silent execution if this field is not set to one of the available options.
+      
+    *   `dual`: This struct contains the following fields:
+        *   `tol`: $\epsilon$ tolerance stopping criterion for dual estimation, $\| \mathcal{J} ^{k} _{\theta} - \mathcal{J} ^{k-1} _{\theta} \| < \epsilon$, the algorithm will terminate when the improvement in the parameter mean-squared-error (MSE) cost between two iterations is less than `tol` (e.g., settings.dual.tol = 1e-6).
+        *   `maxIter`: $K$ Maximum iteration tolerance stopping criterion for dual estimation, (e.g., settings.dual.maxIter = 10000, the algorithm will terminate when `maxIter` reaches $10000$).
+        *   `type`: The dual estimator variant that should be set to either `DB-P` for **dual basis-parameter** estimator or `DS-P` for **dual state-parameter** estimator as discussed in [Library modes](#library-modes). The default is set `DS-P` when the mode is set to `dualMMSEestimate`.
+          
+        All the above fields are required **ONLY** if the mode is set to `dualMMSEestimate` (i.e., `settings.mode = 'dualMMSEestimate'`); otherwise, `dual` can be left empty (i.e., `settings.dual = []`).
+        
     *   `activeLearning`: This struct contains the following fields:
-        *   `gradTol`: Stopping criterion for gradient norm threshold, i.e., $\big\lVert \nabla _{\overline{\mathrm{u}}} \mathcal{J} ^{\star} _{\mathrm{B}}(\overline{\mathrm{u}}^{k}) \big\rVert <$ `gradTol`.
-        *   `costTol`: Stopping criterion for cost decrease threshold, i.e., $\big\lvert \mathcal{J} ^{\star} _{\mathrm{B}}(\overline{\mathrm{u}}^{k+1}) - \mathcal{J} ^{\star} _{\mathrm{B}}(\overline{\mathrm{u}}^{k}) \big\rvert <$ `costTol`.
+        *   `solver`: The optimization method that should be set to either `adaptive`, `fmincon` as discussed in [Library modes](#library-modes). The default is set `adaptive` when the mode is set to `activeLearning`.
         *   `maxIter`: Stopping criterion for the maximum number of iterations allowed. The algorithm will terminate when $k$ reaches `maxIter`.
-        *   `alpha`: The initial value $\alpha _{0}$ required for the adaptive stepsize algorithm (recommended value: $\alpha _{0} = 10^{-10}$).
-        *   `beta`: The initial value $\beta _{0}$ required for the adaptive stepsize algorithm (recommended value: $\beta _{0} = 10^{100}$).
         *   `applyToInitX`: A boolean variable determining whether or not the optimization of $\overline{\mathrm{u}}$ includes optimizing the initial state $\mu _{\mathrm{x} _{0}}$.
         *   `existConstraint`: A boolean variable determining whether or not there exists a constraint on the input $\mathbb{U}$.
         *   `vecUmax`: A vector with size $n _{\mathrm{u}}$ that contains the maximum values each dimension of $\mathrm{u} _{t}$ can take. This is required **ONLY** if `existConstraint` is set to true; otherwise, it can be left empty (i.e., `settings.activeLearning.vecUmax = []`).
         *   `vecUmin`: A vector with size $n _{\mathrm{u}}$ that contains the minimum values each dimension of $\mathrm{u} _{t}$ can take. This is required **ONLY** if `existConstraint` is set to true; otherwise, it can be left empty (i.e., `settings.activeLearning.vecUmin = []`).
         *   `maxInitState`: A vector with size $n _{\mathrm{x}}$ that contains the maximum values the initial state $\mu _{\mathrm{x} _{0}}$ can take. This is required **ONLY** if both `existConstraint` and `applyToInitX` are set to true; otherwise, it can be left empty (i.e., `settings.activeLearning.maxInitState = []`).
         *   `minInitState`: A vector with size $n _{\mathrm{x}}$ that contains the minimum values the initial state $\mu _{\mathrm{x} _{0}}$ can take. This is required **ONLY** if both `existConstraint` and `applyToInitX` are set to true; otherwise, it can be left empty (i.e., `settings.activeLearning.minInitState = []`).
+        *   `gradTol`: Stopping criterion for gradient norm threshold, i.e., $\big\lVert \nabla _{\overline{\mathrm{u}}} \mathcal{J} ^{\star} _{\mathrm{B}}(\overline{\mathrm{u}}^{k}) \big\rVert <$ `gradTol`. This is required and should be defined **ONLY** if both `solver` is set to `adaptive`; otherwise, do **NOT** define it.
+        *   `costTol`: Stopping criterion for cost decrease threshold, i.e., $\big\lvert \mathcal{J} ^{\star} _{\mathrm{B}}(\overline{\mathrm{u}}^{k+1}) - \mathcal{J} ^{\star} _{\mathrm{B}}(\overline{\mathrm{u}}^{k}) \big\rvert <$ `costTol`. This is required and should be defined **ONLY** if both `solver` is set to `adaptive`; otherwise, do **NOT** define it.
+        *   `alpha`: The initial value $\alpha _{0}$ required for the adaptive stepsize algorithm (recommended value: $\alpha _{0} = 10^{-10}$). This is required and should be defined **ONLY** if both `solver` is set to `adaptive`; otherwise, do **NOT** define it.
+        *   `beta`: The initial value $\beta _{0}$ required for the adaptive stepsize algorithm (recommended value: $\beta _{0} = 10^{100}$). This is required and should be defined **ONLY** if both `solver` is set to `adaptive`; otherwise, do **NOT** define it.
 
         All the above fields are required **ONLY** if the mode is set to `activeLearning` (i.e., `settings.mode = 'activeLearning'`); otherwise, `activeLearning` can be left empty (i.e., `settings.activeLearning = []`).
 
-*   **`vecYbar`**: The vector of measurements, i.e., $\overline{\mathrm{y}} = \[ \mathrm{y} _{0}, \ldots, \mathrm{y} _{T} \] ^{\mathsf{T}}$. This is required **ONLY** if the mode is set to `affineMMSEestimate` or `dualMMSEestimate`; otherwise, it can be left empty (i.e., `vecYbar = []`).
+*   **`vecYbar`**: The vector of measurements, i.e., $\mathrm{y} = \[ \mathrm{y} _{0}, \ldots, \mathrm{y} _{T} \] ^{\mathsf{T}}$. This is required **ONLY** if the mode is set to `affineMMSEestimate` or `dualMMSEestimate`; otherwise, it can be left empty (i.e., `vecYbar = []`).
