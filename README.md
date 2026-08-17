@@ -135,60 +135,90 @@ The `nonlinearBayesian4Wiener` library provides three modes of operation:
    
    The routine returns the optimized input trajectory and information about the optimization process. See [*Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model*](https://arxiv.org/abs/2504.05490) for the underlying formulation.
 
-
 ## Usage
 
-The `nonlinearBayesian4Wiener` library can be invoked in MATLAB using the following command:
+From the repository root, add the source directory to the MATLAB path:
 
-`[estimator, optimizer, optimalUbar] = nonlinearBayesian4Wiener(model, settings, vecYbar);`
+```matlab
+addpath(genpath('src'));
+```
 
-Ensure that the the library's `src` folder is added to MATLAB's path (e.g., `addpath('./src')`), and the inputs are configured according to the descriptions below.
+Invoke the library as follows:
 
-### Inputs
+```matlab
+[estimator, optimizer, optimalUbar] = nonlinearBayesian4Wiener(model, settings, vecYbar);
+```
 
-The `Bayesian4Wiener` library takes the following three major inputs:
+Configure `model`, `settings`, and `vecYbar` as described below.
 
-*   **`model`**: This struct contains the following model parameters:
-    *   `numState`: The number of states $n _{\mathrm{x}}$.
-    *   `numInput`: The number of inputs $n _{\mathrm{u}}$.
-    *   `numTheta`: The number of unknown parameters, including the zero frequency, $N+1$.  
-    *   `trajectoryT`: The time index of the trajectory ending time $T$.
-    *   `matrixAbar`: The state transition matrix for the entire trajectory, $\mathrm{A}$.
-    *   `matrixBbar`: The input matrix for the entire trajectory, $\mathrm{B}$.
-    *   `vecUbar`: The input vector for the entire trajectory, $\mathrm{u}$.
-    *   `allVecFreq`: The row vector collection of all frequencies $f_{n}$, **EXCLUDING FREQUENCY 0**, i.e., $\[ f _{1}, f _{2}, \ldots, f _{N} \]$.
-    *   `muTheta`: The mean of the unknown $\theta$ prior distribution, $\mu _{\theta}$.
-    *   `sigmaTheta`: The covariance of the unknown $\theta$ prior distribution, $\Sigma _{\theta}$.
-    *   `sigmaVbar`: The measurement noise covariance, $\Sigma _{\mathrm{v}}$.
-    *   `sigmaWbar`: The process noise covariance, $\Sigma _{\mathrm{w}}$.
+### `model`
+This struct contains the following model parameters:
+| Field | Description |
+|---|---|
+| `numState` | Number of state components, $`n_{\mathrm{x}}`$ |
+| `numInput` | Number of input components, $`n_{\mathrm{u}}`$ |
+| `numTheta` | Number of *unknown* parameters, including the zero-frequency coefficient: $`N+1`$ |
+| `trajectoryT` | Final trajectory index, $`T`$ |
+| `matrixAbar` | Lifted state-transition matrix, $`\mathrm{A}`$ |
+| `matrixBbar` | Lifted input matrix, $`\mathrm{B}`$ |
+| `vecUbar` | Lifted input vector, $`\mathrm{u}`$ |
+| `allVecFreq` | Row-wise collection of all nonzero frequency vectors: $`[f_1, f_2, \ldots, f_N]`$. Frequency $`f_0`$ is excluded because $`\phi_0(\mathrm{x}) = 1`$ |
+| `muTheta` | Prior mean of the *unknown* parameter vector, $`\mu_{\theta}`$ |
+| `sigmaTheta` | Prior covariance of the *unknown* parameter vector, $`\Sigma_{\theta}`$ |
+| `sigmaVbar` | Lifted measurement-noise covariance, $`\Sigma_{\mathrm{v}}`$ |
+| `sigmaWbar` | Lifted process-noise covariance, $`\Sigma_{\mathrm{w}}`$ |
 
-    All the above fields are mandatory and should be properly provided in order for the library to run.
+All fields in `model` are required.
 
-*   **`settings`**: This struct contains the following fields:
-    *   `mode`: One of the modes discussed in [Library modes](#library-modes), i.e., `affineMMSEestimate`, `dualMMSEestimate`, or `activeLearning`.  This field should be set to one of the available options for the library to run.
-    *   `verbose`: One of the verbosity levels, where $0$ means silent execution and $1$ or $2$ provide minor debugging messages.  Allowed values are 0, 1, or 2. The default is set $0$ for silent execution if this field is not set to one of the available options.
-      
-    *   `dual`: This struct contains the following fields:
-        *   `tol`: $\epsilon$ tolerance stopping criterion for dual estimation, $\| \mathcal{J} ^{k} _{\theta} - \mathcal{J} ^{k-1} _{\theta} \| < \epsilon$, the algorithm will terminate when the improvement in the parameter mean-squared-error (MSE) cost between two iterations is less than `tol` (e.g., settings.dual.tol = 1e-6).
-        *   `maxIter`: $K$ Maximum iteration tolerance stopping criterion for dual estimation, (e.g., settings.dual.maxIter = 10000, the algorithm will terminate when `maxIter` reaches $10000$).
-        *   `type`: The dual estimator variant that should be set to either `DB-P` for **dual basis-parameter** estimator or `DS-P` for **dual state-parameter** estimator as discussed in [Library modes](#library-modes). The default is set `DS-P` when the mode is set to `dualMMSEestimate`.
-          
-        All the above fields are required **ONLY** if the mode is set to `dualMMSEestimate` (i.e., `settings.mode = 'dualMMSEestimate'`); otherwise, `dual` can be left empty (i.e., `settings.dual = []`).
-        
-    *   `activeLearning`: This struct contains the following fields:
-        *   `solver`: The optimization method that should be set to either `adaptive`, `fmincon` as discussed in [Library modes](#library-modes). The default is set `adaptive` when the mode is set to `activeLearning`.
-        *   `maxIter`: Stopping criterion for the maximum number of iterations allowed. The algorithm will terminate when $k$ reaches `maxIter`.
-        *   `applyToInitX`: A boolean variable determining whether or not the optimization of $\overline{\mathrm{u}}$ includes optimizing the initial state $\mu _{\mathrm{x} _{0}}$.
-        *   `existConstraint`: A boolean variable determining whether or not there exists a constraint on the input $\mathbb{U}$.
-        *   `vecUmax`: A vector with size $n _{\mathrm{u}}$ that contains the maximum values each dimension of $\mathrm{u} _{t}$ can take. This is required **ONLY** if `existConstraint` is set to true; otherwise, it can be left empty (i.e., `settings.activeLearning.vecUmax = []`).
-        *   `vecUmin`: A vector with size $n _{\mathrm{u}}$ that contains the minimum values each dimension of $\mathrm{u} _{t}$ can take. This is required **ONLY** if `existConstraint` is set to true; otherwise, it can be left empty (i.e., `settings.activeLearning.vecUmin = []`).
-        *   `maxInitState`: A vector with size $n _{\mathrm{x}}$ that contains the maximum values the initial state $\mu _{\mathrm{x} _{0}}$ can take. This is required **ONLY** if both `existConstraint` and `applyToInitX` are set to true; otherwise, it can be left empty (i.e., `settings.activeLearning.maxInitState = []`).
-        *   `minInitState`: A vector with size $n _{\mathrm{x}}$ that contains the minimum values the initial state $\mu _{\mathrm{x} _{0}}$ can take. This is required **ONLY** if both `existConstraint` and `applyToInitX` are set to true; otherwise, it can be left empty (i.e., `settings.activeLearning.minInitState = []`).
-        *   `gradTol`: Stopping criterion for gradient norm threshold, i.e., $\big\lVert \nabla _{\overline{\mathrm{u}}} \mathcal{J} ^{\star} _{\mathrm{B}}(\overline{\mathrm{u}}^{k}) \big\rVert <$ `gradTol`. This is required and should be defined **ONLY** if both `solver` is set to `adaptive`; otherwise, do **NOT** define it.
-        *   `costTol`: Stopping criterion for cost decrease threshold, i.e., $\big\lvert \mathcal{J} ^{\star} _{\mathrm{B}}(\overline{\mathrm{u}}^{k+1}) - \mathcal{J} ^{\star} _{\mathrm{B}}(\overline{\mathrm{u}}^{k}) \big\rvert <$ `costTol`. This is required and should be defined **ONLY** if both `solver` is set to `adaptive`; otherwise, do **NOT** define it.
-        *   `alpha`: The initial value $\alpha _{0}$ required for the adaptive stepsize algorithm (recommended value: $\alpha _{0} = 10^{-10}$). This is required and should be defined **ONLY** if both `solver` is set to `adaptive`; otherwise, do **NOT** define it.
-        *   `beta`: The initial value $\beta _{0}$ required for the adaptive stepsize algorithm (recommended value: $\beta _{0} = 10^{100}$). This is required and should be defined **ONLY** if both `solver` is set to `adaptive`; otherwise, do **NOT** define it.
+### `settings`
+This struct contains the following fields:
+| Field | Allowed values / type | Description |
+|---|---|---|
+| `mode` | `affineMMSEestimate`, `dualMMSEestimate`, or `activeLearning` | Library mode; see [Library modes](#library-modes) |
+| `verbose` | `0`, `1`, or `2` | Verbosity level: `0` is silent; `1` and `2` enable progressively more diagnostic output. Default: `0` |
+| `dual` | Struct or `[]` | Dual-estimation settings. Required only when `mode` is `dualMMSEestimate`; otherwise set `settings.dual = []` |
+| `activeLearning` | Struct or `[]` | Active-learning settings. Required only when `mode` is `activeLearning`; otherwise set `settings.activeLearning = []` |
 
-        All the above fields are required **ONLY** if the mode is set to `activeLearning` (i.e., `settings.mode = 'activeLearning'`); otherwise, `activeLearning` can be left empty (i.e., `settings.activeLearning = []`).
+#### `settings.dual`
 
-*   **`vecYbar`**: The vector of measurements, i.e., $\mathrm{y} = \[ \mathrm{y} _{0}, \ldots, \mathrm{y} _{T} \] ^{\mathsf{T}}$. This is required **ONLY** if the mode is set to `affineMMSEestimate` or `dualMMSEestimate`; otherwise, it can be left empty (i.e., `vecYbar = []`).
+Required only when:
+
+```matlab
+settings.mode = 'dualMMSEestimate';
+```
+
+| Field | Allowed values / type | Description |
+|---|---|---|
+| `tol` | Positive scalar | Convergence tolerance $\epsilon$. The algorithm terminates when $`\left\lvert \mathcal{J}_{\theta}^{k} - \mathcal{J}_{\theta}^{k-1} \right\rvert < \epsilon`$. Example: `settings.dual.tol = 1e-6` |
+| `maxIter` | Positive integer | Maximum number of fixed-point iterations, $K$. The algorithm terminates when the iteration count reaches `maxIter`. Example: `settings.dual.maxIter = 10000` |
+| `type` | `DB-P` or `DS-P` | Dual-estimator variant: `DB-P` is the **dual basis-parameter** estimator; `DS-P` is the **dual state-parameter** estimator; see [Library modes](#library-modes). Default: `DS-P` |
+
+#### `settings.activeLearning`
+
+Required only when:
+
+```matlab
+settings.mode = 'activeLearning';
+```
+
+| Field | Required | Description |
+|---|---|---|
+| `solver` | Always | Optimization method: `adaptive` or `fmincon`. The `fmincon` method requires MATLAB Optimization Toolbox; see [Library modes](#library-modes). Default: `adaptive`  |
+| `maxIter` | Always | Maximum number of optimization iterations. The algorithm terminates when the iteration count reaches `maxIter` |
+| `applyToInitX` | Always | Logical flag indicating whether optimization of $`\mathrm{u}`$ includes the initial-state mean $`\mu_{\mathrm{x}_0}`$ |
+| `existConstraint` | Always | Logical flag indicating whether the feasible input set $`\mathbb{U}`$ includes input constraints |
+| `vecUmax` | When `existConstraint = true`; otherwise set to `[]` (`settings.activeLearning.vecUmax = []`) | Vector of length $`n_{\mathrm{u}}`$ containing the upper bounds on each component of $`\mathrm{u}_t`$ |
+| `vecUmin` | When `existConstraint = true`; otherwise set to `[]` (`settings.activeLearning.vecUmin = []`) | Vector of length $`n_{\mathrm{u}}`$ containing the lower bounds on each component of $`\mathrm{u}_t`$ |
+| `maxInitState` | When `existConstraint = true` and `applyToInitX = true`; otherwise set to `[]` (`settings.activeLearning.maxInitState = []`) | Vector of length $`n_{\mathrm{x}}`$ containing upper bounds on $`\mu_{\mathrm{x}_0}`$ |
+| `minInitState` | When `existConstraint = true` and `applyToInitX = true`; otherwise set to `[]` (`settings.activeLearning.minInitState = []`) | Vector of length $`n_{\mathrm{x}}`$ containing lower bounds on $`\mu_{\mathrm{x}_0}`$ |
+| `gradTol` | When `solver = 'adaptive'`; otherwise do **NOT** define | Gradient-norm stopping tolerance. The adaptive optimizer terminates when the norm of the objective gradient, $`\lVert \nabla_{\mathrm{u}} \mathcal{J}^{\star}_{\theta}(\mathrm{u}^{k}) \rVert`$, is below `gradTol` |
+| `costTol` | When `solver = 'adaptive'`; otherwise do **NOT** define | Cost-decrease stopping tolerance. The adaptive optimizer terminates when the absolute change in objective value, $`\lvert \mathcal{J}^{\star}_{\theta}(\mathrm{u}^{k+1}) - \mathcal{J}^{\star}_{\theta}(\mathrm{u}^{k}) \rvert`$ is below `costTol` |
+| `alpha` | When `solver = 'adaptive'`; otherwise do **NOT** define | Initial adaptive stepsize parameter $`\alpha_0`$. Recommended value: `1e-10` |
+| `beta` | When `solver = 'adaptive'`; otherwise do **NOT** define | Initial adaptive stepsize parameter $`\beta_0`$. Recommended value: `1e100` |
+
+### `vecYbar`
+
+| Argument | Required | Description |
+|---|---|---|
+| $`vecYbar`$ | When `settings.mode` is `affineMMSEestimate` or `dualMMSEestimate`; otherwise set to `[]` (`vecYbar = []`) | Measurement vector $`\mathrm{y} = [ \mathrm{y} _{0}, \ldots, \mathrm{y} _{T} ] ^{\mathsf{T}}`$ |
+
