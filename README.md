@@ -9,7 +9,7 @@ This repository provides a MATLAB library for Bayesian estimation and active inp
 - An affine minimum mean-squared-error (MMSE) estimator for the unknown observation-model parameters;
 - Dual estimators for joint learning of the latent state and unknown parameters;
 - An active-learning algorithm for optimal input design, based on:
-  > S. Vakili, M. Mazo Jr., and P. Mohajerin Esfahani, *Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model*, IEEE Transactions on Automatic Control, under revision, 2025.
+  > S. Vakili, M. Mazo Jr., and P. Mohajerin Esfahani, *Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model*, arXiv preprint arXiv:2504.05490, 2025.
 
 ## Overview
 
