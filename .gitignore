@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+
+# MATLAB backup and temporary files
+*.asv
+*.m~
+*.autosave
+*.tmp
+*.temp
+*.bak
+
+# MATLAB crashes and profiling
+matlab_crash_dump.*
+*.mprof
+*.mlprof
+
+# MATLAB-generated files
+codegen/
+slprj/
+sfprj/
+*.mexmaci64
+*.mexmaca64
+*.mexmaci
+*.mexw64
+*.mexw32
+*.oct
+
+
+# MATLAB data files: keep this only if no .mat file is essential
+*.mat
