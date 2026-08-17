@@ -25,6 +25,3 @@ sfprj/
 *.mexw32
 *.oct
 
-
-# MATLAB data files: keep this only if no .mat file is essential
-*.mat
