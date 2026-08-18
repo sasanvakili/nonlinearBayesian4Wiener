@@ -1,6 +1,16 @@
 function estimator = dualBasisEstimator(model, vecYbar, settings)
-% This function computes the theta and basis estimates
-% "TBD"
+% This function implements the dual basis-parameter (DB-P) estimator
+% defined in subsection 3.1 of the paper:
+%   "Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization".
+%
+% The function returns the dynamic-basis-statistics (DBS) mean and
+% covariance estimates, the parameter estimate and its estimation-error
+% covariance, and fixed-point iteration information: termination status,
+% number of iterations, and cost history from the first iteration through
+% termination.
+% 
+% Paper: https://arxiv.org/abs/2606.10111
+% Requirements: nonlinearBayesian4Wiener library; see README.md for details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
 % @date: October 2025

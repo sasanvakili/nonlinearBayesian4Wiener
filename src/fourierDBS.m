@@ -4,13 +4,13 @@ function [sigmaPhi, muPhi] = fourierDBS(numTheta, allVecFreq, matrixAi, ...
 % expression defined in Lemma 4.1 of Section 4 from the paper:
 %   "Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model".
 %
-% This computation is critical for implementing the proposed optimal Bayesian estimator.
+% This computation is critical for implementing the proposed nonlinear Bayesian estimators.
 %
 % Paper: https://arxiv.org/abs/2504.05490
-% Requirements: Bayesian4Wiener library (see README for details)
+% Requirements: nonlinearBayesian4Wiener library; see README.md for details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
-% @date: April 2025
+% @date: October 2025
 
 sigmaPhi = zeros(numTheta, numTheta);
 

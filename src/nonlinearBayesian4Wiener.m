@@ -1,8 +1,27 @@
 function [estimator, optimizer, optimalUbar] = nonlinearBayesian4Wiener(model, settings, vecYbar)
-% TBD
+% This function implements the methods developed in the paper:
+%   "Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization"
+%
+% Depending on the selected operating mode, this function:
+%
+%   1. Computes the optimal Bayesian affine MMSE estimator for unknown
+%      observation-model parameters and the corresponding parameter estimate.
+%
+%   2. Computes a dual estimator for joint learning of unknown parameters
+%      and latent variables, using either the dual basis-parameter (DB-P)
+%      or dual state-parameter (DS-P) formulation.
+%
+%   3. Designs an experiment input using active learning to minimize the
+%      anticipated affine parameter-estimation error. This mode is based on the paper:
+%           "Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model".
+%
+% Papers: 
+%   https://arxiv.org/abs/2606.10111
+%   https://arxiv.org/abs/2504.05490
+% Requirements: See README.md for installation and usage details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
-% @date: July 2025
+% @date: October 2025
 
 settings = validateInputs(model, settings, vecYbar);
 estimator = struct;
@@ -24,7 +43,7 @@ switch settings.mode
             optimalUbar = [];
         case 'dualMMSEestimate'
             switch settings.dual.type
-                case 'State_Parameter'
+                case 'DS-P'
                     if (settings.verbose >= 1)
                         msg = 'Computing the dual estimates of theta and states:';
                         disp(msg)
@@ -32,7 +51,7 @@ switch settings.mode
                     estimator = dualStateEstimator(model, vecYbar, settings);
                     optimizer = [];
                     optimalUbar = [];
-                case 'Basis_Parameter'
+                case 'DB-P'
                     if (settings.verbose >= 1)
                         msg = 'Computing the dual estimates of theta and basis collection:';
                         disp(msg)

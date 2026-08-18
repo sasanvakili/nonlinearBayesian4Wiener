@@ -8,10 +8,10 @@ function gradientUbar = thetaMMSEgradient(model, estimator)
 % estimation error.
 %
 % Paper: https://arxiv.org/abs/2504.05490
-% Requirements: Bayesian4Wiener library (see README for details)
+% Requirements: nonlinearBayesian4Wiener library; see README.md for details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
-% @date: April 2025
+% @date: October 2025
 
 costPhibar = 2*((estimator.matrixPsi).')*( ...
     (estimator.matrixPsi)*((estimator.matrixPhibar).')-eye(model.numTheta) ...

@@ -1,5 +1,5 @@
 function [estimator, optimizer, optimalUbar] = adaptiveGradientDescent(model, settings)
-% This function the adaptive gradient descent algorithm for active learning
+% This function implements the adaptive gradient descent algorithm for active learning
 % as defined in Section 5 of the paper:
 %   "Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model".
 %
@@ -9,10 +9,10 @@ function [estimator, optimizer, optimalUbar] = adaptiveGradientDescent(model, se
 % input signal.
 %
 % Paper: https://arxiv.org/abs/2504.05490
-% Requirements: Bayesian4Wiener library (see README for details)
+% Requirements: nonlinearBayesian4Wiener library; see README.md for details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
-% @date: April 2025
+% @date: October 2025
 
 % Decision variable: vecUbar
 if (settings.verbose >= 2)

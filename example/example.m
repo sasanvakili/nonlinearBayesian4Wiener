@@ -55,7 +55,7 @@ settings = struct;
 settings.mode = 'dualMMSEestimate';
 settings.dual.tol = 1e-6;
 settings.dual.maxIter = 10000;
-settings.dual.type = 'State_Parameter';
+settings.dual.type = 'DS-P';
 settings.verbose = 2;
 tic
 [dualStateParameterEstimator, ~, ~] = nonlinearBayesian4Wiener(model, settings, vecYbar);
@@ -119,7 +119,7 @@ settings = struct;
 settings.mode = 'dualMMSEestimate';
 settings.dual.tol = 1e-6;
 settings.dual.maxIter = 10000;
-settings.dual.type = 'State_Parameter';
+settings.dual.type = 'DS-P';
 settings.verbose = 2;
 tic
 [dualStateParameterEstimator, ~, ~] = nonlinearBayesian4Wiener(model, settings, vecYbar);
@@ -141,7 +141,7 @@ settings = struct;
 settings.mode = 'dualMMSEestimate';
 settings.dual.tol = 1e-6;
 settings.dual.maxIter = 100; %10000;
-settings.dual.type = 'Basis_Parameter';
+settings.dual.type = 'DB-P';
 settings.verbose = 2;
 tic
 [dualBasisParameterEstimator, ~, ~] = nonlinearBayesian4Wiener(model, settings, vecYbar);
@@ -209,7 +209,7 @@ settings = struct;
 settings.mode = 'dualMMSEestimate';
 settings.dual.tol = 1e-6;
 settings.dual.maxIter = 10000;
-settings.dual.type = 'State_Parameter';
+settings.dual.type = 'DS-P';
 settings.verbose = 2;
 tic
 [dualStateParameterEstimator, ~, ~] = nonlinearBayesian4Wiener(model, settings, vecYbar);
@@ -231,7 +231,7 @@ settings = struct;
 settings.mode = 'dualMMSEestimate';
 settings.dual.tol = 1e-6;
 settings.dual.maxIter = 100; %10000;
-settings.dual.type = 'Basis_Parameter';
+settings.dual.type = 'DB-P';
 settings.verbose = 2;
 tic
 [dualBasisParameterEstimator, ~, ~] = nonlinearBayesian4Wiener(model, settings, vecYbar);

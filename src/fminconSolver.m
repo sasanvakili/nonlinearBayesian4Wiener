@@ -1,17 +1,20 @@
 function [optimizer, optimalUbar] = fminconSolver(model, settings)
-% This function finds the optimal Input using SQP algorithm with a given gradient.
+% This function finds the optimal Input sequence using SQP algorithm 
+% with a given gradient.
 %
 % The algorithm optimizes input signals to minimize the Bayesian MMSE
 % estimation error for Wiener system identification. It returns estimator
 % parameters, Optimization metrics (e.g., convergence status), Optimal
 % input signal.
 %
+% The active-learning formulation is presented in Section 5 of the paper:
+%   "Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model".
+% 
 % Paper: https://arxiv.org/abs/2504.05490
-% Requirements: Bayesian4Wiener library (see README for details)
+% Requirements: nonlinearBayesian4Wiener library; see README.md for details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
-% @date: May 2025
-%
+% @date: October 2025
 
 % Decision variable: vecUbar
 if (settings.verbose >= 1)

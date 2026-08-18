@@ -1,8 +1,24 @@
 function settings = validateInputs(model, settings, vecYbar)
-% TBD
+% This function validates the input arguments provided to
+% nonlinearBayesian4Wiener, including their required fields, data types,
+% dimensions, and admissible values.
+%
+% The validation ensures that `model`, `settings`, and `vecYbar` conform to
+% the input format required by the selected estimation or active-learning
+% mode. The checks are consistent with the Wiener-model formulation and
+% estimation algorithms described in the papers:
+%
+%   "Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization".
+%
+%   "Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model".
+%
+% Papers: 
+%   https://arxiv.org/abs/2606.10111
+%   https://arxiv.org/abs/2504.05490
+% Requirements: See README.md for input specifications and usage details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
-% @date: July 2025
+% @date: October 2025
 
 if ~isstruct(model)
     error('First input argument must be a struct');
@@ -99,9 +115,9 @@ if (strcmp(settings.mode, 'dualMMSEestimate'))
     end
     
     if ~isfield(settings.dual, 'type')
-        settings.dual.type = 'State_Parameter';
+        settings.dual.type = 'DS-P';
     else
-        validDualTypes = {'State_Parameter', 'Basis_Parameter'};
+        validDualTypes = {'DS-P', 'DB-P'};
         settings.dual.type = validatestring(settings.dual.type, ...
             validDualTypes);
     end

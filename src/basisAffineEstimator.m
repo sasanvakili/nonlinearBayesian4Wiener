@@ -1,5 +1,13 @@
 function basisEstimator = basisAffineEstimator(model)
-% TBD
+% This function computes the DBS estimation via affine MMSE basis estimator
+% defined in Lemma 3.1 of the paper:
+%   "Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization".
+%
+% The function returns the estimator parameters and 
+% optimal cost as derived in the lemma.
+%
+% Paper: https://arxiv.org/abs/2606.10111
+% Requirements: nonlinearBayesian4Wiener library; see README.md for details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
 % @date: October 2025
@@ -9,11 +17,8 @@ vecBbarUbar = model.matrixBbar*model.vecUbar;
 matrixMuTheta = cell(1, model.trajectoryT+1);
 matrixPhibar = zeros(model.numTheta, model.trajectoryT+1);
 matrixSigmaPhi = cell(model.numTheta*(model.trajectoryT+1), 1);
-% matrixSigmaPhi = zeros(model.numTheta*(model.trajectoryT+1), ...
-    % model.numTheta*(model.trajectoryT+1));
 matrixM = zeros(model.trajectoryT+1, model.trajectoryT+1);
 parfor i=0:model.trajectoryT
-% for i=0:model.trajectoryT
     matrixAi = model.matrixAbar(model.numState*i+1:model.numState*i+model.numState, :);
     rowsMatrixM = zeros(1, model.trajectoryT+1);
     rowsSigmaPhi = zeros(model.numTheta, model.numTheta*(model.trajectoryT+1));
@@ -34,8 +39,7 @@ parfor i=0:model.trajectoryT
         rowsSigmaPhi(:, j*model.numTheta+1:(j+1)*model.numTheta) = tempSigmaPhi;
     end
     matrixM(i+1, :) = rowsMatrixM;
-    matrixSigmaPhi(i+1) = {rowsSigmaPhi};
-    % matrixSigmaPhi(i*model.numTheta+1:(i+1)*model.numTheta, :) = rowsSigmaPhi;   
+    matrixSigmaPhi(i+1) = {rowsSigmaPhi};  
 end
 matrixSigmaPhi = cell2mat(matrixSigmaPhi);
 matrixM = matrixM+triu(matrixM,1).';

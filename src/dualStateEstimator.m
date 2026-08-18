@@ -1,9 +1,19 @@
 function estimator = dualStateEstimator(model, vecYbar, settings)
-% This function computes the theta and states estimates
-% "TBD"
+% This function implements the dual state-parameter (DS-P) estimator
+% defined in subsection 3.2 of the paper:
+%   "Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization".
+%
+% The function returns the state estimate and its estimation-error
+% covariance, the parameter estimate and its estimation-error
+% covariance, and fixed-point iteration information: termination status,
+% number of iterations, and cost history from the first iteration through
+% termination.
+% 
+% Paper: https://arxiv.org/abs/2606.10111
+% Requirements: nonlinearBayesian4Wiener library; see README.md for details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
-% @date: May 2025
+% @date: October 2025
 
 muThetaInit = model.muTheta;
 sigmaThetaInit = model.sigmaTheta;

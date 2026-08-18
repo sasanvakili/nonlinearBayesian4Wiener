@@ -1,5 +1,11 @@
 function basisInit = basisPrior(model)
-% TBD
+% This function computes the DBS prior according to Definition 1 of the paper:
+%   "Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization".
+%
+% The function returns the DBS prior collection.
+%
+% Paper: https://arxiv.org/abs/2606.10111
+% Requirements: nonlinearBayesian4Wiener library; see README.md for details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
 % @date: October 2025
@@ -8,10 +14,7 @@ basisInit = struct;
 vecBbarUbar = model.matrixBbar*model.vecUbar;
 matrixPhibar = zeros(model.numTheta, model.trajectoryT+1);
 matrixSigmaPhi = cell(model.numTheta*(model.trajectoryT+1), 1);
-% matrixSigmaPhi = zeros(model.numTheta*(model.trajectoryT+1), ...
-    % model.numTheta*(model.trajectoryT+1));
 parfor i=0:model.trajectoryT
-% for i=0:model.trajectoryT
     matrixAi = model.matrixAbar(model.numState*i+1:model.numState*i+model.numState, :);
     rowsSigmaPhi = zeros(model.numTheta, model.numTheta*(model.trajectoryT+1));
     for j=i:model.trajectoryT
@@ -28,8 +31,7 @@ parfor i=0:model.trajectoryT
         end
         rowsSigmaPhi(:, j*model.numTheta+1:(j+1)*model.numTheta) = tempSigmaPhi;
     end
-    matrixSigmaPhi(i+1) = {rowsSigmaPhi};
-    % matrixSigmaPhi(i*model.numTheta+1:(i+1)*model.numTheta, :) = rowsSigmaPhi;   
+    matrixSigmaPhi(i+1) = {rowsSigmaPhi};  
 end
 matrixSigmaPhi = cell2mat(matrixSigmaPhi);
 matrixSigmaPhi = matrixSigmaPhi+triu(matrixSigmaPhi,1).';

@@ -7,10 +7,10 @@ function [sigmaPhiVecUbar, muPhiVecUbar] = fourierDBSgradient(numTheta, ...
 % This computation is critical for implementing the proposed active learning algorithm.
 %
 % Paper: https://arxiv.org/abs/2504.05490
-% Requirements: Bayesian4Wiener library (see README for details)
+% Requirements: nonlinearBayesian4Wiener library; see README.md for details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
-% @date: April 2025
+% @date: October 2025
 
 sigmaPhiVecUbar = zeros(numTheta, numTheta, length(vecUbar));
 

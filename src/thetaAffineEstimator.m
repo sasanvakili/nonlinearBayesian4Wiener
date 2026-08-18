@@ -1,22 +1,21 @@
 function thetaEstimator = thetaAffineEstimator(model, vecBbarUbar)
 % This function computes the Optimal Bayesian MMSE affine estimator defined in Theorem
-% 3.2 of Section 3 from the paper:
-%   "Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model".
+% 2.2 of the paper:
+%   "Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization".
 %
 % It returns the estimator parameters and optimal cost as derived in the theorem.
 % 
-% Paper: https://arxiv.org/abs/2504.05490
-% Requirements: Bayesian4Wiener library (see README for details)
+% Paper: https://arxiv.org/abs/2606.10111
+% Requirements: nonlinearBayesian4Wiener library; see README.md for details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
-% @date: April 2025
+% @date: October 2025
 
 thetaEstimator = struct;
 
 matrixPhibar = zeros(model.numTheta, model.trajectoryT+1);
 matrixM = zeros(model.trajectoryT+1, model.trajectoryT+1);
 parfor i=0:model.trajectoryT
-% for i=0:model.trajectoryT
     matrixAi = model.matrixAbar(model.numState*i+1:model.numState*i+model.numState, :);
     rowsMatrixM = zeros(1, model.trajectoryT+1);
     for j=i:model.trajectoryT

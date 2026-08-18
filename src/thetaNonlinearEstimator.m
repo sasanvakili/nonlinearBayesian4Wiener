@@ -1,8 +1,15 @@
 function thetaEstimator = thetaNonlinearEstimator(model, matrixPhibar, matrixSigmaPhi)
-
+% This function computes the nonlinear parameter estimator defined in
+% Equation 13 in Section 2 of the paper:
+%   "Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization".
+%
+% It returns the estimator parameters and estimation error as derived in the theorem 2.2.
+% 
+% Paper: https://arxiv.org/abs/2606.10111
+% Requirements: nonlinearBayesian4Wiener library; see README.md for details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
-% @date: April 2025
+% @date: October 2025
 
 thetaEstimator = struct;
 matrixM = zeros(model.trajectoryT+1, model.trajectoryT+1);

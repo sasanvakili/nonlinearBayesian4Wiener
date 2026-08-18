@@ -1,8 +1,16 @@
 function stateEstimator = stateAffineEstimator(model)
-% TBD
+% This function computes the Optimal Bayesian MMSE affine state estimator 
+% defined in Lemma 3.5 of the paper:
+%   "Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization".
+%
+% The function returns the estimator parameters and 
+% optimal cost as derived in the lemma.
+%
+% Paper: https://arxiv.org/abs/2606.10111
+% Requirements: nonlinearBayesian4Wiener library; see README.md for details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
-% @date: July 2025
+% @date: October 2025
 
 stateEstimator = struct;
 vecBbarUbar = model.matrixBbar*model.vecUbar;

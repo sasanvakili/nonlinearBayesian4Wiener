@@ -1,11 +1,16 @@
 function [optimizationCost, gradientUbar] = fminconMMSEgradient(vecUbar, model, settings)
-% This function return the cost and fourier DBS gradient required for
-% fmincon algorithm.
+% This function prepares the Bayesian affine-MMSE estimation cost and its
+% gradient with respect to the input trajectory, used by MATLAB's
+% fmincon solver in the active-learning mode.
+%
+% The active-learning formulation is presented in Section 5 of the paper:
+%   "Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model".
+% 
 % Paper: https://arxiv.org/abs/2504.05490
-% Requirements: Bayesian4Wiener library (see README for details)
+% Requirements: nonlinearBayesian4Wiener library; see README.md for details.
 % ----------------------------------------------------------------------------------
 % @author: Sasan Vakili
-% @date: May 2025
+% @date: October 2025
 
 %VecUbar Translation:
 model.vecUbar = vecUbar;
