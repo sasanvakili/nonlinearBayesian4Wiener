@@ -315,3 +315,23 @@ $`\mathrm{u}^{\star}`$ for both optimization methods.
 | `optimalCost` | Final objective value, $`\mathcal{J}_{\theta}^{\star}(\mathrm{u}^{\star})`$ |
 
 When `settings.activeLearning.solver = 'fmincon'`, `estimator` is returned as `[]`.
+
+### Examples
+
+The [`example/example.m`](example/example.m) script demonstrates how to configure the model and settings structs, provide measurements, and run each available mode of `nonlinearBayesian4Wiener`.
+
+The `example/Experiment_setup_1/` and `example/Experiment_setup_2/` directories contain the corresponding `experimentData.mat` files used by the script and in the Numerical Experiments of the [accompanying paper](https://arxiv.org/abs/2606.10111).
+
+## Citing
+
+If you use the `nonlinearBayesian4Wiener` library for research, please cite our accompanying paper:
+
+```bibtex
+@article{vakili2026nonlinear,
+  title={Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization},
+  author={Vakili, Sasan and Woonings, Dani{\"e}l and Paruchuri, Pradyumna and Mohajerin Esfahani, Peyman},
+  journal={arXiv preprint arXiv:2606.10111},
+  year={2026}
+}
+```
+
