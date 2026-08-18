@@ -2,7 +2,7 @@
 
 Code accompanying the paper:
 
-> S. Vakili, D. Woonings, P. Paruchuri, and P. Mohajerin Esfahani, *Dual Bayesian Affine Estimators for Parameter Learning: A Fixed-Point Characterization*.
+> S. Vakili, D. Woonings, P. Paruchuri, and P. Mohajerin Esfahani, *Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization*.
 
 This repository provides a MATLAB library for Bayesian estimation and active input design in Wiener models. It includes:
 
@@ -13,7 +13,7 @@ This repository provides a MATLAB library for Bayesian estimation and active inp
 
 ## Overview
 
-The Wiener model considered here consists of known discrete-time, linear time-varying state dynamics and an observation model with unknown parameters:
+The Wiener model considered here consists of known discrete-time, linear time-varying state dynamics and an observation model with *unknown* parameters:
 
 $$
 \mathrm{x} _{t+1} = \mathrm{A} _{t} \mathrm{x} _{t} + \mathrm{B} _{t} \mathrm{u} _{t} + \mathrm{w} _{t+1},
@@ -83,7 +83,7 @@ $$
 $$
 
 This library uses these structures to compute the affine MMSE estimate $`\hat{\theta}_{\mathrm{af}}`$ and the nonlinear Bayesian estimate $`\hat{\theta}_{\mathrm{nl}}`$, obtained using either the **dual basis-parameter** (DB-P) or **dual state-parameter**
-(DS-P) estimator. For further details, see the paper [*Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization*](https://arxiv.org/abs/2606.10111).
+(DS-P) estimator. For further details, see the [accompanying paper](https://arxiv.org/abs/2606.10111).
 
 ## Requirements
 
@@ -117,7 +117,7 @@ no third-party dependencies.
 The `nonlinearBayesian4Wiener` library provides three modes of operation:
 
 1. **`affineMMSEestimate`**
-   Computes the optimal Bayesian affine MMSE estimator for the *unknown* parameter vector using the measurements over the complete trajectory, $\mathrm{y}$. It evaluates $\hat{\theta} _{\mathrm{af}}(\mathrm{y}) = \Psi^{\star} _{\theta}\mathrm{y} + \psi^{\star} _{\theta}$ and returns the optimal affine coefficients $\Psi^{\star} _{\theta}$, $\psi^{\star} _{\theta}$, the prior dynamic basis statistics mean $\mu _{\mathrm{\Phi}}$, the operator $\mathcal{M}$, the optimal cost $\mathcal{J} ^{\star} _{\theta}$, the parameter estimate $\hat{\theta} _{\mathrm{af}}$, and its estimation-error covariance $\Sigma _{\hat{\theta} _{\mathrm{af}}}$. See Theorem 2.2 of [*Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization*](https://arxiv.org/abs/2606.10111).
+   Computes the optimal Bayesian affine MMSE estimator for the *unknown* parameter vector using the measurements over the complete trajectory, $\mathrm{y}$. It evaluates $\hat{\theta} _{\mathrm{af}}(\mathrm{y}) = \Psi^{\star} _{\theta}\mathrm{y} + \psi^{\star} _{\theta}$ and returns the optimal affine coefficients $\Psi^{\star} _{\theta}$, $\psi^{\star} _{\theta}$, the prior dynamic basis statistics mean $\mu _{\mathrm{\Phi}}$, the operator $\mathcal{M}$, the optimal cost $\mathcal{J} ^{\star} _{\theta}$, the parameter estimate $\hat{\theta} _{\mathrm{af}}$, and its estimation-error covariance $\Sigma _{\hat{\theta} _{\mathrm{af}}}$. See Theorem 2.2 of [accompanying paper](https://arxiv.org/abs/2606.10111).
 
 2. **`dualMMSEestimate`**
    Computes the nonlinear Bayesian parameter estimate $`\hat{\theta}_{\mathrm{nl}}`$ through a fixed-point iteration that couples the affine parameter estimator with a dynamic-basis-statistics (DBS) estimator. Select either:
@@ -125,13 +125,13 @@ The `nonlinearBayesian4Wiener` library provides three modes of operation:
    - `DB-P` for the **dual basis-parameter** estimator, which updates DBS estimates directly through an affine basis estimator.
    - `DS-P` for the **dual state-parameter estimator**, which first computes affine state estimates and their covariance, then maps these state statistics to DBS estimates through the Gaussian DBS operator.
    
-   The procedure alternates between parameter estimation and DBS estimation or state estimation until the specified convergence criterion is met. It returns the nonlinear parameter estimates $(\hat{\theta} _{\mathrm{nl}}, \Sigma _{\hat{\theta} _{\mathrm{nl}}})$, the DBS estimates $(\hat{\mathrm{\Phi}} _{\mathrm{nl}}, \Sigma _{\hat{\mathrm{\Phi}} _{\mathrm{nl}}})$, or state estimates $(\hat{\mathrm{x}} _{\mathrm{nl}}, \Sigma _{\hat{\mathrm{x}} _{\mathrm{nl}}})$, together with fixed-point iteration information. See Section 3 of [*Nonlinear Bayesian Estimator for Parameter Learning: A Fixed-Point Characterization*](https://arxiv.org/abs/2606.10111) for details.
+   The procedure alternates between parameter estimation and DBS estimation or state estimation until the specified convergence criterion is met. It returns the nonlinear parameter estimates $(\hat{\theta} _{\mathrm{nl}}, \Sigma _{\hat{\theta} _{\mathrm{nl}}})$, the DBS estimates $(\hat{\mathrm{\Phi}} _{\mathrm{nl}}, \Sigma _{\hat{\mathrm{\Phi}} _{\mathrm{nl}}})$, or state estimates $(\hat{\mathrm{x}} _{\mathrm{nl}}, \Sigma _{\hat{\mathrm{x}} _{\mathrm{nl}}})$, together with fixed-point iteration information. See Section 3 of [accompanying paper](https://arxiv.org/abs/2606.10111) for details.
 
 3. **`activeLearning`**
    Designs an input sequence for the experiment by minimizing anticipated parameter-estimation uncertainty. The optimal input can be determined *a priori* and independently of measurements by solving $\mathrm{u}^{\star} \in \arg\min _{\mathrm{u} \in \mathbb{U}} \mathbb{E} \[ \lVert \theta - \hat{\theta} _{\mathrm{af}}(\mathrm{y}) \rVert ^{2} \]$, where $\mathbb{U}$ is the input space encoding physical constraints on feasible experiment inputs. The method supports two optimizers:
 
    - `adaptive`, which uses the library’s adaptive gradient-descent routine and does not require MATLAB Optimization Toolbox.
-   - `fmincon`, which uses MATLAB's `fmincon` solver and therefore requires MATLAB Optimization Toolbox.
+   - `fmincon`, which uses sequential quadratic programming (`sqp`) algorithm via MATLAB's `fmincon` solver and therefore requires MATLAB Optimization Toolbox.
    
    The routine returns the optimized input trajectory and information about the optimization process. See [*Optimal Bayesian Affine Estimator and Active Learning for the Wiener Model*](https://arxiv.org/abs/2504.05490) for the underlying formulation.
 
@@ -149,9 +149,11 @@ Invoke the library as follows:
 [estimator, optimizer, optimalUbar] = nonlinearBayesian4Wiener(model, settings, vecYbar);
 ```
 
-Configure `model`, `settings`, and `vecYbar` as described below.
+Configure the input arguments `model`, `settings`, and `vecYbar` as described below. The library returns the outputs `estimator`, `optimizer`, and `optimalUbar`, which are described after the input arguments.
 
-### `model`
+### Inputs
+The input arguments `model`, `settings`, and `vecYbar` are discussed as follows:
+#### `model`
 This struct contains the following model parameters:
 | Field | Description |
 |---|---|
@@ -170,16 +172,16 @@ This struct contains the following model parameters:
 
 All fields in `model` are required.
 
-### `settings`
+#### `settings`
 This struct contains the following fields:
 | Field | Allowed values / type | Description |
 |---|---|---|
-| `mode` | `affineMMSEestimate`, `dualMMSEestimate`, or `activeLearning` | Library mode; see [Library modes](#library-modes) |
+| `mode` | `'affineMMSEestimate'`, `'dualMMSEestimate'`, or `'activeLearning'` | Library mode; see [Library modes](#library-modes) |
 | `verbose` | `0`, `1`, or `2` | Verbosity level: `0` is silent; `1` and `2` enable progressively more diagnostic output. Default: `0` |
-| `dual` | Struct or `[]` | Dual-estimation settings. Required only when `mode` is `dualMMSEestimate`; otherwise set `settings.dual = []` |
-| `activeLearning` | Struct or `[]` | Active-learning settings. Required only when `mode` is `activeLearning`; otherwise set `settings.activeLearning = []` |
+| `dual` | Struct or `[]` | Dual-estimation settings. Required only when `settings.mode = 'dualMMSEestimate'`; otherwise set `settings.dual = []` |
+| `activeLearning` | Struct or `[]` | Active-learning settings. Required only when `settings.mode = 'activeLearning'`; otherwise set `settings.activeLearning = []` |
 
-#### `settings.dual`
+##### `settings.dual`
 
 Required only when:
 
@@ -191,9 +193,9 @@ settings.mode = 'dualMMSEestimate';
 |---|---|---|
 | `tol` | Positive scalar | Convergence tolerance $\epsilon$. The algorithm terminates when $`\left\lvert \mathcal{J}_{\theta}^{k} - \mathcal{J}_{\theta}^{k-1} \right\rvert < \epsilon`$. Example: `settings.dual.tol = 1e-6` |
 | `maxIter` | Positive integer | Maximum number of fixed-point iterations, $K$. The algorithm terminates when the iteration count reaches `maxIter`. Example: `settings.dual.maxIter = 10000` |
-| `type` | `DB-P` or `DS-P` | Dual-estimator variant: `DB-P` is the **dual basis-parameter** estimator; `DS-P` is the **dual state-parameter** estimator; see [Library modes](#library-modes). Default: `DS-P` |
+| `type` | `'DB-P'` or `'DS-P'` | Dual-estimator variant: `'DB-P'` is the **dual basis-parameter** estimator; `'DS-P'` is the **dual state-parameter** estimator; see [Library modes](#library-modes). Default: `'DS-P'` |
 
-#### `settings.activeLearning`
+##### `settings.activeLearning`
 
 Required only when:
 
@@ -203,22 +205,113 @@ settings.mode = 'activeLearning';
 
 | Field | Required | Description |
 |---|---|---|
-| `solver` | Always | Optimization method: `adaptive` or `fmincon`. The `fmincon` method requires MATLAB Optimization Toolbox; see [Library modes](#library-modes). Default: `adaptive`  |
+| `solver` | Always | Optimization method: `'adaptive'` or `'fmincon'`. The `'fmincon'` applies sequential quadratic programming (`sqp`) algorithm which requires MATLAB Optimization Toolbox; see [Library modes](#library-modes). Default: `'adaptive'`  |
 | `maxIter` | Always | Maximum number of optimization iterations. The algorithm terminates when the iteration count reaches `maxIter` |
 | `applyToInitX` | Always | Logical flag indicating whether optimization of $`\mathrm{u}`$ includes the initial-state mean $`\mu_{\mathrm{x}_0}`$ |
 | `existConstraint` | Always | Logical flag indicating whether the feasible input set $`\mathbb{U}`$ includes input constraints |
-| `vecUmax` | When `existConstraint = true`; otherwise set to `[]` (`settings.activeLearning.vecUmax = []`) | Vector of length $`n_{\mathrm{u}}`$ containing the upper bounds on each component of $`\mathrm{u}_t`$ |
-| `vecUmin` | When `existConstraint = true`; otherwise set to `[]` (`settings.activeLearning.vecUmin = []`) | Vector of length $`n_{\mathrm{u}}`$ containing the lower bounds on each component of $`\mathrm{u}_t`$ |
-| `maxInitState` | When `existConstraint = true` and `applyToInitX = true`; otherwise set to `[]` (`settings.activeLearning.maxInitState = []`) | Vector of length $`n_{\mathrm{x}}`$ containing upper bounds on $`\mu_{\mathrm{x}_0}`$ |
-| `minInitState` | When `existConstraint = true` and `applyToInitX = true`; otherwise set to `[]` (`settings.activeLearning.minInitState = []`) | Vector of length $`n_{\mathrm{x}}`$ containing lower bounds on $`\mu_{\mathrm{x}_0}`$ |
-| `gradTol` | When `solver = 'adaptive'`; otherwise do **NOT** define | Gradient-norm stopping tolerance. The adaptive optimizer terminates when the norm of the objective gradient, $`\lVert \nabla_{\mathrm{u}} \mathcal{J}^{\star}_{\theta}(\mathrm{u}^{k}) \rVert`$, is below `gradTol` |
-| `costTol` | When `solver = 'adaptive'`; otherwise do **NOT** define | Cost-decrease stopping tolerance. The adaptive optimizer terminates when the absolute change in objective value, $`\lvert \mathcal{J}^{\star}_{\theta}(\mathrm{u}^{k+1}) - \mathcal{J}^{\star}_{\theta}(\mathrm{u}^{k}) \rvert`$ is below `costTol` |
-| `alpha` | When `solver = 'adaptive'`; otherwise do **NOT** define | Initial adaptive stepsize parameter $`\alpha_0`$. Recommended value: `1e-10` |
-| `beta` | When `solver = 'adaptive'`; otherwise do **NOT** define | Initial adaptive stepsize parameter $`\beta_0`$. Recommended value: `1e100` |
+| `vecUmax` | When `settings.activeLearning.existConstraint = true`; otherwise set to `[]` (`settings.activeLearning.vecUmax = []`) | Vector of length $`n_{\mathrm{u}}`$ containing the upper bounds on each component of $`\mathrm{u}_t`$ |
+| `vecUmin` | When `settings.activeLearning.existConstraint = true`; otherwise set to `[]` (`settings.activeLearning.vecUmin = []`) | Vector of length $`n_{\mathrm{u}}`$ containing the lower bounds on each component of $`\mathrm{u}_t`$ |
+| `maxInitState` | When `settings.activeLearning.existConstraint = true` and `settings.activeLearning.applyToInitX = true`; otherwise set to `[]` (`settings.activeLearning.maxInitState = []`) | Vector of length $`n_{\mathrm{x}}`$ containing upper bounds on $`\mu_{\mathrm{x}_0}`$ |
+| `minInitState` | When `settings.activeLearning.existConstraint = true` and `settings.activeLearning.applyToInitX = true`; otherwise set to `[]` (`settings.activeLearning.minInitState = []`) | Vector of length $`n_{\mathrm{x}}`$ containing lower bounds on $`\mu_{\mathrm{x}_0}`$ |
+| `gradTol` | When `settings.activeLearning.solver = 'adaptive'`; otherwise do **NOT** define | Gradient-norm stopping tolerance. The adaptive optimizer terminates when the norm of the objective gradient, $`\lVert \nabla_{\mathrm{u}} \mathcal{J}^{\star}_{\theta}(\mathrm{u}^{k}) \rVert`$, is below `gradTol` |
+| `costTol` | When `settings.activeLearning.solver = 'adaptive'`; otherwise do **NOT** define | Cost-decrease stopping tolerance. The adaptive optimizer terminates when the absolute change in objective value, $`\lvert \mathcal{J}^{\star}_{\theta}(\mathrm{u}^{k+1}) - \mathcal{J}^{\star}_{\theta}(\mathrm{u}^{k}) \rvert`$ is below `costTol` |
+| `alpha` | When `settings.activeLearning.solver = 'adaptive'`; otherwise do **NOT** define | Initial adaptive stepsize parameter $`\alpha_0`$. Recommended value: `1e-10` |
+| `beta` | When `settings.activeLearning.solver = 'adaptive'`; otherwise do **NOT** define | Initial adaptive stepsize parameter $`\beta_0`$. Recommended value: `1e100` |
 
-### `vecYbar`
+#### `vecYbar`
 
 | Argument | Required | Description |
 |---|---|---|
-| $`vecYbar`$ | When `settings.mode` is `affineMMSEestimate` or `dualMMSEestimate`; otherwise set to `[]` (`vecYbar = []`) | Measurement vector $`\mathrm{y} = [ \mathrm{y} _{0}, \ldots, \mathrm{y} _{T} ] ^{\mathsf{T}}`$ |
+| `vecYbar` | When `settings.mode` is `'affineMMSEestimate'` or `'dualMMSEestimate'`; otherwise set to `[]` (`vecYbar = []`) | Measurement vector $`\mathrm{y} = [ \mathrm{y} _{0}, \ldots, \mathrm{y} _{T} ] ^{\mathsf{T}}`$ |
 
+### Outputs
+
+The `nonlinearBayesian4Wiener` library returns `estimator`, `optimizer`, and `optimalUbar`. Their contents depend on `settings.mode` and, for active learning, on `settings.activeLearning.solver`.
+
+| Mode | `estimator` | `optimizer` | `optimalUbar` |
+|---|---|---|---|
+| `affineMMSEestimate` | Affine MMSE estimator results | `[]` | `[]` |
+| `dualMMSEestimate` with `DB-P` variant | Dual basis-parameter estimator results | `[]` | `[]` |
+| `dualMMSEestimate` with `DS-P` variant | Dual state-parameter estimator results | `[]` | `[]` |
+| `activeLearning` with `adaptive` solver | Affine MMSE estimator quantities at the final input iterate | Adaptive-optimization results | Optimized stacked input vector |
+| `activeLearning` with `fmincon` solver | `[]` | `fmincon` results | Optimized stacked input vector |
+
+#### `estimator` for `affineMMSEestimate`
+
+| Field | Description |
+|---|---|
+| `matrixPsi` | Optimal affine coefficient $`\Psi_{\theta}^{\star}`$ |
+| `vecPsi` | Optimal affine offset $`\psi_{\theta}^{\star}`$ |
+| `matrixPhibar` | Prior dynamic-basis-statistics mean $`\mu_{\Phi}`$; see Definition 1 of the [accompanying paper](https://arxiv.org/abs/2606.10111) |
+| `matrixM` | Matrix representation of the operator $`\mathcal{M}`$ from Theorem 2.2 of the [accompanying paper](https://arxiv.org/abs/2606.10111) |
+| `thetaEstimate` | Affine parameter estimate $`\hat{\theta}_{\mathrm{af}}`$ |
+| `sigmaThetaEst` | Estimation-error covariance $`\Sigma_{\hat{\theta}_{\mathrm{af}}}`$ |
+| `thetaErr` | Optimal estimation cost $`\mathcal{J}_{\theta}^{\star}`$ |
+
+#### `estimator` for `dualMMSEestimate`
+
+The fields below are returned for both dual-estimator variants.
+
+| Field | Description |
+|---|---|
+| `status` | Termination status: `converged` if the cost-change tolerance is met, or `max iterations` if the fixed-point iteration reaches `settings.dual.maxIter` |
+| `totalIter` | Number of fixed-point iterations completed before termination |
+| `thetaEstErr` | Cost history from iteration $1$ through termination: $`[\mathcal{J}_{\theta}^{1}, \ldots, \mathcal{J}_{\theta}^{k}]`$ |
+| `thetaEstimate` | Nonlinear Bayesian parameter estimate at termination, $`\hat{\theta}_{\mathrm{nl}}`$ |
+| `sigmaThetaEstimate` | Estimation-error covariance at termination, $`\Sigma_{\hat{\theta}_{\mathrm{nl}}}`$ |
+
+The fixed-point iteration terminates when the absolute difference between
+successive parameter-estimation costs is less than `settings.dual.tol`, or
+when the iteration count reaches `settings.dual.maxIter`. See Algorithm 1 of
+the [accompanying paper](https://arxiv.org/abs/2606.10111).
+
+##### Additional fields for `DB-P`
+
+| Field | Description |
+|---|---|
+| `basisEstimate` | DBS mean estimate at termination, $`\hat{\Phi}_{\mathrm{nl}}`$ |
+| `sigmaBasisEstimate` | DBS covariance estimate at termination, $`\Sigma_{\hat{\Phi}_{\mathrm{nl}}}`$ |
+
+##### Additional fields for `DS-P`
+
+| Field | Description |
+|---|---|
+| `stateEstimate` | State estimate at termination, $`\hat{\mathrm{x}}_{\mathrm{nl}}`$ |
+| `sigmaStateEstimate` | State-estimation covariance at termination, $`\Sigma_{\hat{\mathrm{x}}_{\mathrm{nl}}}`$ |
+
+#### Outputs for `activeLearning`
+
+`optimalUbar` contains the optimized stacked input vector
+$`\mathrm{u}^{\star}`$ for both optimization methods.
+
+##### `optimizer` with `settings.activeLearning.solver = 'adaptive'`
+
+| Field | Description |
+|---|---|
+| `alpha` | Final adaptive stepsize parameter, $`\alpha_k`$ |
+| `beta` | Final adaptive parameter, $`\beta_k`$ |
+| `status` | Termination status: `converged` or `max iterations` |
+| `totalIter` | Number of adaptive-gradient-descent iterations completed |
+| `gradient` | Objective gradient at termination, $`\nabla_{\mathrm{u}}\mathcal{J}_{\theta}^{\star}(\mathrm{u}^{K})`$ |
+| `optimalCost` | Final objective value, $`\mathcal{J}_{\theta}^{\star}(\mathrm{u}^{\star})`$ |
+
+##### `estimator` with `settings.activeLearning.solver = 'adaptive'`
+
+| Field | Description |
+|---|---|
+| `matrixPsi` | Optimal affine coefficient $`\Psi_{\theta}^{\star}`$ at the final input iterate |
+| `vecPsi` | Optimal affine offset $`\psi_{\theta}^{\star}`$ at the final input iterate |
+| `matrixPhibar` | Prior DBS mean $`\mu_{\Phi}`$ at the final input iterate |
+| `matrixM` | Matrix representation of $`\mathcal{M}`$ at the final input iterate |
+| `sigmaThetaEst` | Affine-estimation error covariance $`\Sigma_{\hat{\theta}_{\mathrm{af}}}`$ |
+| `thetaErr` | Final optimal estimation cost $`\mathcal{J}_{\theta}^{\star}`$ |
+
+##### `optimizer` with `settings.activeLearning.solver = 'fmincon'`
+
+| Field | Description |
+|---|---|
+| `status` | `exitflag` returned by MATLAB `fmincon` |
+| `output` | `output` struct returned by MATLAB `fmincon` |
+| `optimalCost` | Final objective value, $`\mathcal{J}_{\theta}^{\star}(\mathrm{u}^{\star})`$ |
+
+When `settings.activeLearning.solver = 'fmincon'`, `estimator` is returned as `[]`.
