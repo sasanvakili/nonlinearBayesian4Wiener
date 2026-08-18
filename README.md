@@ -231,8 +231,8 @@ The `nonlinearBayesian4Wiener` library returns `estimator`, `optimizer`, and `op
 | Mode | `estimator` | `optimizer` | `optimalUbar` |
 |---|---|---|---|
 | `affineMMSEestimate` | Affine MMSE estimator results | `[]` | `[]` |
-| `dualMMSEestimate` with `DB-P` variant | Dual basis-parameter estimator results | `[]` | `[]` |
-| `dualMMSEestimate` with `DS-P` variant | Dual state-parameter estimator results | `[]` | `[]` |
+| `dualMMSEestimate` with <br>`DB-P` variant | Dual basis-parameter estimator results | `[]` | `[]` |
+| `dualMMSEestimate` with <br>`DS-P` variant | Dual state-parameter estimator results | `[]` | `[]` |
 | `activeLearning` with `adaptive` solver | Affine MMSE estimator quantities at the final input iterate | Adaptive-optimization results | Optimized stacked input vector |
 | `activeLearning` with `fmincon` solver | `[]` | `fmincon` results | Optimized stacked input vector |
 
